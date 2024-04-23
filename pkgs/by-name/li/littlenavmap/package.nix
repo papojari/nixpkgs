@@ -31,6 +31,8 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-u3H2U+8HZD18Yt6UB7QTTQOrrzN03PGolbFYddG8AIc=";
   };
 
+  patches = [ ./littlenavmap.desktop.patch ];
+
   ATOOLS_LIB_PATH = atools;
   ATOOLS_INC_PATH = "${atools}/include/src";
   MARBLE_LIB_PATH = "${customMarble}/lib";
@@ -59,9 +61,16 @@ stdenv.mkDerivation rec {
 
   installPhase = ''
     runHook preInstall
-    mkdir -p $out/bin
-    mv littlenavmap customize data help translations plugins $out/bin/
-    runHook postInstall
+    mkdir -p $out/bin $out/lib/littlenavmap $out/share/{applications,icons/hicolor/{32x32,1024x1024,scalable}/apps}
+    mv littlenavmap customize data help translations plugins $out/lib/littlenavmap/
+    ln -s $out/lib/lressources/icons/littlenavmap.pngittlenavmap/littlenavmap $out/bin/
+
+    cd ..
+    mv resources/icons/littlenavmap.png $out/share/icons/hicolor/32x32/apps/littlenavmap.png
+    mv resources/icons/littlenavmap1024.png $out/share/icons/hicolor/1024x1024/apps/littlenavmap.png
+    mv resources/icons/littlenavmap.svg $out/share/icons/hicolor/scalable/apps/littlenavmap.svg
+    mv desktop/Little\ Navmap.desktop $out/share/applications/littlenavmap.desktop
+    runHook postinstall
   '';
 
   meta = with lib; {
